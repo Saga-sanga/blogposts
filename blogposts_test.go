@@ -32,27 +32,45 @@ A
 L
 M`
 	)
-	fs := fstest.MapFS{
-		"hello world.md":  {Data: []byte(firstBody)},
-		"hello-world2.md": {Data: []byte(secondBody)},
-	}
+	t.Run("check if file is read accurately", func(t *testing.T) {
 
-	posts, err := blogposts.NewPostsFromFS(fs)
+		fs := fstest.MapFS{
+			"hello world.md":  {Data: []byte(firstBody)},
+			"hello-world2.md": {Data: []byte(secondBody)},
+		}
 
-	if err != nil {
-		t.Fatal(err)
-	}
+		posts, err := blogposts.NewPostsFromFS(fs)
 
-	if len(posts) != len(fs) {
-		t.Errorf("got %d posts, wanted %d posts", len(posts), len(fs))
-	}
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	assertPost(t, posts[0], blogposts.Post{
-		Title:       "Post 1",
-		Description: "Description 1",
-		Tags:        []string{"tdd", "go"},
-		Body: `Hello
+		if len(posts) != len(fs) {
+			t.Errorf("got %d posts, wanted %d posts", len(posts), len(fs))
+		}
+
+		assertPost(t, posts[0], blogposts.Post{
+			Title:       "Post 1",
+			Description: "Description 1",
+			Tags:        []string{"tdd", "go"},
+			Body: `Hello
 World`,
+		})
+	})
+
+	t.Run("test extension", func(t *testing.T) {
+		fs := fstest.MapFS{
+			"hello world.md":  {Data: []byte(firstBody)},
+			"hello-world2.md": {Data: []byte(secondBody)},
+			"hello-world3.go": {Data: []byte(secondBody)},
+		}
+
+		_, err := blogposts.NewPostsFromFS(fs)
+
+		if err.Error() != blogposts.InvalidExtensionError {
+			t.Errorf("Wanted to receive error %q but didn't get any", blogposts.InvalidExtensionError)
+		}
+
 	})
 }
 
