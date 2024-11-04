@@ -6,6 +6,7 @@ import (
 
 	"github.com/Saga-sanga/blogposts"
 	"github.com/Saga-sanga/blogposts/blogrenderer"
+	approvals "github.com/approvals/go-approval-tests"
 )
 
 func TestRender(t *testing.T) {
