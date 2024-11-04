@@ -25,6 +25,7 @@ func NewPostsFromFS(fileSystem fs.FS) ([]Post, error) {
 }
 
 func getPost(fileSystem fs.FS, fileName string) (Post, error) {
+	// Check if the file has a valid extension i.e. ".md"
 	ext := strings.Split(fileName, ".")[1]
 	if ext != "md" {
 		return Post{}, errors.New(InvalidExtensionError)
