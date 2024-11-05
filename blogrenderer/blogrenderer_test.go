@@ -37,13 +37,12 @@ func TestRender(t *testing.T) {
 	})
 
 	t.Run("it converts md body to HTML", func(t *testing.T) {
-		var buf bytes.Buffer
-
-		if err := postRenderer.ConvertToMarkdown(&buf, aPost.Body); err != nil {
+		htmlBody, err := postRenderer.MarkdownToHTML(aPost.Body)
+		if err != nil {
 			t.Fatal(err)
 		}
 
-		approvals.VerifyString(t, buf.String())
+		approvals.VerifyString(t, string(htmlBody))
 	})
 }
 

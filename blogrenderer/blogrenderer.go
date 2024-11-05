@@ -37,9 +37,8 @@ func NewPostRenderer() (*PostRenderer, error) {
 }
 
 func (r *PostRenderer) Render(w io.Writer, p blogposts.Post) error {
-	var buf bytes.Buffer
-
-	if err := r.ConvertToMarkdown(&buf, p.Body); err != nil {
+	htmlBody, err := r.MarkdownToHTML(p.Body)
+	if err != nil {
 		return err
 	}
 
@@ -48,7 +47,7 @@ func (r *PostRenderer) Render(w io.Writer, p blogposts.Post) error {
 		HTMLBody template.HTML
 	}{
 		Post:     p,
-		HTMLBody: template.HTML(buf.String()),
+		HTMLBody: htmlBody,
 	}
 
 	if err := r.templ.ExecuteTemplate(w, "blog.gohtml", data); err != nil {
@@ -58,10 +57,12 @@ func (r *PostRenderer) Render(w io.Writer, p blogposts.Post) error {
 	return nil
 }
 
-func (r *PostRenderer) ConvertToMarkdown(w io.Writer, mdContent string) error {
-	if err := r.markdown.Convert([]byte(mdContent), w); err != nil {
-		return err
+func (r *PostRenderer) MarkdownToHTML(mdContent string) (template.HTML, error) {
+	var buf bytes.Buffer
+
+	if err := r.markdown.Convert([]byte(mdContent), &buf); err != nil {
+		return "", err
 	}
 
-	return nil
+	return template.HTML(buf.String()), nil
 }
