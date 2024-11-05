@@ -28,5 +28,4 @@ func TestRender(t *testing.T) {
 
 		approvals.VerifyString(t, buf.String())
 	})
-
 }
