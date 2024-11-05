@@ -19,7 +19,7 @@ func Render(w io.Writer, p blogposts.Post) error {
 		return err
 	}
 
-	if err := templ.Execute(w, p); err != nil {
+	if err := templ.ExecuteTemplate(w, "blog.gohtml", p); err != nil {
 		return err
 	}
 
