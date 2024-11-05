@@ -50,11 +50,7 @@ func (r *PostRenderer) Render(w io.Writer, p blogposts.Post) error {
 		HTMLBody: htmlBody,
 	}
 
-	if err := r.templ.ExecuteTemplate(w, "blog.gohtml", data); err != nil {
-		return err
-	}
-
-	return nil
+	return r.templ.ExecuteTemplate(w, "blog.gohtml", data)
 }
 
 func (r *PostRenderer) MarkdownToHTML(mdContent string) (template.HTML, error) {
@@ -65,4 +61,8 @@ func (r *PostRenderer) MarkdownToHTML(mdContent string) (template.HTML, error) {
 	}
 
 	return template.HTML(buf.String()), nil
+}
+
+func (r *PostRenderer) RenderIndex(w io.Writer, posts []blogposts.Post) error {
+	return r.templ.ExecuteTemplate(w, "index.gohtml", posts)
 }

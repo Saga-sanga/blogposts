@@ -15,6 +15,10 @@ type Post struct {
 	Body        string
 }
 
+func (p Post) SanitisedTitle() string {
+	return strings.ToLower(strings.Replace(p.Title, " ", "-", -1))
+}
+
 const (
 	titleSeparator       = "Title: "
 	descriptionSeparator = "Description: "
