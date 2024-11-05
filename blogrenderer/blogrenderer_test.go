@@ -13,8 +13,11 @@ import (
 func TestRender(t *testing.T) {
 	var (
 		aPost = blogposts.Post{
-			Title:       "hello world",
-			Body:        "This is a post",
+			Title: "hello world",
+			Body: `## This is a post
+Something about lists
+- Item
+- Item 2`,
 			Description: "This is a description",
 			Tags:        []string{"go", "tdd"},
 		}
@@ -26,6 +29,15 @@ func TestRender(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	t.Run("it converts md body to HTML", func(t *testing.T) {
+		htmlBody, err := postRenderer.MarkdownToHTML(aPost.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		approvals.VerifyString(t, string(htmlBody))
+	})
+
 	t.Run("it converts a single post to HTML", func(t *testing.T) {
 		buf := bytes.Buffer{}
 
@@ -34,15 +46,6 @@ func TestRender(t *testing.T) {
 		}
 
 		approvals.VerifyString(t, buf.String())
-	})
-
-	t.Run("it converts md body to HTML", func(t *testing.T) {
-		htmlBody, err := postRenderer.MarkdownToHTML(aPost.Body)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		approvals.VerifyString(t, string(htmlBody))
 	})
 }
 
