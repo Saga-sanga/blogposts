@@ -29,15 +29,6 @@ Something about lists
 		t.Fatal(err)
 	}
 
-	t.Run("it converts md body to HTML", func(t *testing.T) {
-		htmlBody, err := postRenderer.MarkdownToHTML(aPost.Body)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		approvals.VerifyString(t, string(htmlBody))
-	})
-
 	t.Run("it converts a single post to HTML", func(t *testing.T) {
 		buf := bytes.Buffer{}
 

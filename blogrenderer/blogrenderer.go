@@ -37,32 +37,31 @@ func NewPostRenderer() (*PostRenderer, error) {
 }
 
 func (r *PostRenderer) Render(w io.Writer, p blogposts.Post) error {
-	htmlBody, err := r.MarkdownToHTML(p.Body)
+	data, err := newPostVM(p, r)
 	if err != nil {
 		return err
-	}
-
-	data := struct {
-		blogposts.Post
-		HTMLBody template.HTML
-	}{
-		Post:     p,
-		HTMLBody: htmlBody,
 	}
 
 	return r.templ.ExecuteTemplate(w, "blog.gohtml", data)
 }
 
-func (r *PostRenderer) MarkdownToHTML(mdContent string) (template.HTML, error) {
-	var buf bytes.Buffer
-
-	if err := r.markdown.Convert([]byte(mdContent), &buf); err != nil {
-		return "", err
-	}
-
-	return template.HTML(buf.String()), nil
-}
-
 func (r *PostRenderer) RenderIndex(w io.Writer, posts []blogposts.Post) error {
 	return r.templ.ExecuteTemplate(w, "index.gohtml", posts)
+}
+
+type postViewModel struct {
+	blogposts.Post
+	HTMLBody template.HTML
+}
+
+func newPostVM(p blogposts.Post, r *PostRenderer) (postViewModel, error) {
+	var buf bytes.Buffer
+
+	if err := r.markdown.Convert([]byte(p.Body), &buf); err != nil {
+		return postViewModel{}, err
+	}
+
+	vm := postViewModel{Post: p}
+	vm.HTMLBody = template.HTML(buf.String())
+	return vm, nil
 }
