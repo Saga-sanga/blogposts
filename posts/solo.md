@@ -1,6 +1,6 @@
-Title: Title 1
-Description: Description 1
-Tags: tdd, hello
+Title: Han Solo
+Description: This is a brief description
+Tags: tdd, go
 ---
 ## This is title
 This is the main body
