@@ -23,38 +23,45 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var buf bytes.Buffer
+	postrenderer.RenderIndex(&buf, posts)
+	createHTMLFile(buf.String(), "index")
+
 	for _, post := range posts {
-		var buf bytes.Buffer
+		buf.Reset()
 		postrenderer.Render(&buf, post)
+		createHTMLFile(buf.String(), post.SanitisedTitle())
+	}
+}
 
-		// get app directory path
-		appDir, err := os.Getwd()
+func createHTMLFile(html, name string) {
+	// get app directory path
+	appDir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// create directory if it does not exist
+	htmlDir := filepath.Join(appDir, "/html")
+	dir := filepath.Dir(htmlDir)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err := os.MkdirAll(htmlDir, 0755)
 		if err != nil {
 			log.Fatal(err)
 		}
+	}
 
-		// create directory if it does not exist
-		htmlDir := filepath.Join(appDir, "/html")
-		dir := filepath.Dir(htmlDir)
-		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			err := os.MkdirAll(htmlDir, 0755)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+	// create new file
+	filename := filepath.Join(htmlDir, fmt.Sprintf("/%s.html", name))
+	file, err := os.Create(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
 
-		// create new file
-		filename := filepath.Join(htmlDir, fmt.Sprintf("/%s.html", post.SanitisedTitle()))
-		file, err := os.Create(filename)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer file.Close()
-
-		// write data to file
-		_, err = file.Write([]byte(buf.String()))
-		if err != nil {
-			log.Fatal(err)
-		}
+	// write data to file
+	_, err = file.Write([]byte(html))
+	if err != nil {
+		log.Fatal(err)
 	}
 }
